@@ -76,6 +76,42 @@ FROM
 WHERE 
 	Quantity < 20;
 
+-- What if we need to compare all columns?
+MERGE INTO dbo.OrderLinesCopy AS tgt
+USING Sales.OrderLines AS src
+ON src.OrderLineID = tgt.OrderLineID
+WHEN MATCHED  AND 
+	(
+		src.StockItemID <> tgt.StockItemID
+	AND src.Description <> tgt.Description
+	AND src.Quantity	<> tgt.Quantity
+	AND src.UnitPrice	<> tgt.UnitPrice
+	AND src.TaxRate		<> tgt.TaxRate
+	) THEN
+UPDATE
+	SET tgt.TaxRate					= (src.TaxRate * 1.1) -- We're increasing the tax by 10 percent
+	,	tgt.PickingCompletedWhen	= GETDATE()
+	,	tgt.LastEditedBy			= 11
+	,	tgt.LastEditedWhen			= GETDATE()
+WHEN NOT MATCHED THEN
+INSERT 
+	VALUES
+	(
+	src.OrderLineID
+,	src.OrderID
+,	src.StockItemID
+,	src.Description
+,	src.PackageTypeID
+,	src.Quantity
+,	src.UnitPrice
+,	src.TaxRate
+,	src.PickedQuantity
+,	src.PickingCompletedWhen
+,	src.LastEditedBy
+,	src.LastEditedWhen
+	);
+
+
 -- Use the EXISTS predicate + EXCEPT operator
 MERGE INTO dbo.OrderLinesCopy AS tgt
 USING Sales.OrderLines AS src
