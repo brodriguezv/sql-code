@@ -51,7 +51,7 @@ WHERE
 AND	ShiftName = 'Night'
 AND ShiftDate = '2015-03-01'
 ORDER BY
-	EmployeeName ASC
+	EmployeeName ASC;
 
 -- Using LAG
 WITH Shifts
